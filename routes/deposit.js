@@ -30,7 +30,7 @@ router.get('/depositusers', async (req, res) => {
 
     // Use a regular expression to perform a case-insensitive search for the given query
     const searchRegex = new RegExp(searchDepositQuery, 'i');
-    const totalUsers = await Deposit.countDocuments();
+    // const totalUsers = await Deposit.countDocuments();
     
     const users = await Deposit.find({
       $or: [

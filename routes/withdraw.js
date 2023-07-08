@@ -111,8 +111,17 @@ router.get('/withdrawals/:userId', async (req, res) => {
 
 // endpoint for admin to fetch all withdrawal requests
 router.get('/withdrawals', async (req, res) => {
+
+  const withdrawalQuerySearch = req.query.search;
+  const searchRegx = new RegExp(withdrawalQuerySearch, 'i');
+
   try {
-    const withdrawalRequests = await WithdrawalReq.find();
+    const withdrawalRequests = await WithdrawalReq.find({
+      $or:[
+        {name: searchRegx},
+        {userId: searchRegx}
+      ]
+    });
     res.json(withdrawalRequests);
   } catch (error) {
     res.status(500).json(error);
