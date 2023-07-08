@@ -26,7 +26,7 @@ router.post('/withdraw/:userId', async (req, res) => {
         return res.status(400).json({ error: 'Minimum withdrawal amount is 500 Rs' });
       }
     // Check if user has at least two direct referrals
-    const count = await User.countDocuments({ sponsorId: userId  }).sort(is_active);
+    const count = await User.countDocuments({ sponsorId: userId  }).select(is_active === true);
     console.log(count)
     if (count < 2) {
       return res.status(400).json({ error: 'Minimum Two Direct for Withdrawal' });
