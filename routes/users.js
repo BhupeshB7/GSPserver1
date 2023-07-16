@@ -433,7 +433,7 @@ router.post('/activeuser/:userId', async (req, res) => {
       sponsor4Count,
     };
 
-    console.log(data);
+    // console.log(data);
 
     res.json(data);
   } catch (error) {
