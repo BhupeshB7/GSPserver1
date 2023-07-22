@@ -51,7 +51,7 @@
 // taskController.js
 const Task = require('../models/newTask');
 const UserTask = require('../models/userTasks');
-const mongoose = require('mongoose');
+// const mongoose = require('mongoose');
 const getAllTasks = async (req, res) => {
   try {
     const tasks = await Task.find();

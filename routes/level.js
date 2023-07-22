@@ -94,7 +94,7 @@ const User = require('../models/User');
 //   res.send("Account increased successfully");
 // })
 
-router.post("/updateWallet/:userId", async (req, res) => {
+router.post("/updateWalletss/:userId", async (req, res) => {
   const { userId } = req.params;
   let user = await User.findOne({ userId: userId });
   if (!user) {
@@ -107,8 +107,7 @@ router.post("/updateWallet/:userId", async (req, res) => {
   await user.save();
 
   let sponsor = await User.findOne({ userId: user.sponsorId });
-  let sponsorCount = await User.countDocuments({ userId: user.sponsorId });
-
+  let sponsorCount = await User.countDocuments({ userId: user.sponsorId, is_active:true  })
   if (sponsor && sponsorCount >= 1) {
     sponsor.balance += 4;
     sponsor.teamIncome += 4;
@@ -129,7 +128,7 @@ router.post("/updateWallet/:userId", async (req, res) => {
         let sponsor3 = await User.findOne({ userId: sponsor2.sponsorId });
 
         if (sponsor3) {
-          let sponsor3CountUser = await User.countDocuments({ sponsorId: sponsor2.userId });
+          let sponsor3CountUser = await User.countDocuments({ sponsorId: sponsor2.userId, is_active:true  });
 
           if (sponsor3CountUser >= 3) {
             sponsor3.balance += 2;
