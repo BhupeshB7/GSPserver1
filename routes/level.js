@@ -94,7 +94,7 @@ const User = require('../models/User');
 //   res.send("Account increased successfully");
 // })
 
-router.post("/updateWalletss/:userId", async (req, res) => {
+router.post("/updateWallet/:userId", async (req, res) => {
   const { userId } = req.params;
   let user = await User.findOne({ userId: userId });
   if (!user) {
