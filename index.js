@@ -6,6 +6,8 @@ const app = express();
 const profileRoutes = require('./routes/profile');
 const passwordRoute = require('./routes/passwordReset');
 const register = require('./routes/register');
+const taskRoutes = require('./routes/taskRoute')
+const userTaskRoute = require('./routes/userTaskRoute')
 const fileUpload = require("express-fileupload");
 // Connect to MongoDB database
 mongoose.connect(process.env.MONGO_URL, {
@@ -66,6 +68,8 @@ app.use('/api', require('./routes/level'));
 app.use('/api', require('./routes/DailyLevelincome'))
 //contact
 app.use('/api', require('./routes/contact'));
+app.use('/api', taskRoutes);
+app.use('/userTasks', userTaskRoute);
    // Admin 
   app.use((err, req, res, next) => {
     console.error(err.stack);
