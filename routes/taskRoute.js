@@ -34,6 +34,7 @@ router.patch('/tasks/:id/complete', taskController.markTaskCompleted);
 router.delete('/tasks/:id', taskController.deleteTask);
 // New route to delete all tasks
 router.delete('/tasks', taskController.deleteAllTasks);
-
+// Route to fetch task Report 
+router.get('/user/:userId/taskStatus',taskController.taskCompletionStatus)
 module.exports = router;
 

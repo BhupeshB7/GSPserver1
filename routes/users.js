@@ -241,7 +241,7 @@ router.get('/team/:userId', async (req, res) => {
   const { userId } = req.params;
 
   try {
-    const teamStructure = await getUserTeam(userId, 5); // Set the depth to 5 levels
+    const teamStructure = await getUserTeam(userId, 6); // Set the depth to 5 levels
     res.json(teamStructure);
   } catch (error) {
     console.error('Error fetching team structure:', error);
@@ -264,6 +264,7 @@ async function getUserTeam(userId, depth) {
 
     const activeStatus = user.is_active ? 'active' : 'not active';
     const teamStructure = {
+      level: 6-depth,
       userId: user.userId,
       name: user.name,
       mobile: user.mobile,
@@ -297,6 +298,125 @@ async function getUserTeam(userId, depth) {
   }
 }
 // new down line code 239-299
+// count the Rank of user 
+// count the Rank of user End
+//latest code that show the Rank
+// 
+//latest code that show the Rank End
+//new latest code that show the Rank start
+router.get('/teamRank/:userId', async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const user = await User.findOne({ userId }).select('userId is_active').lean();
+
+    if (!user) {
+      res.status(404).json({ error: 'User not found.' });
+      return;
+    }
+
+    const activeUsersByLevel = await getActiveUsersByLevel(userId, 5, user.is_active); // Set the depth to 5 levels
+    const filteredActiveUsersByLevel = filterAchievedRanks(activeUsersByLevel);
+    res.json(filteredActiveUsersByLevel);
+  } catch (error) {
+    console.error('Error fetching team structure:', error);
+    res.status(500).json({ error: 'An error occurred while fetching the team structure.' });
+  }
+});
+
+async function getActiveUsersByLevel(userId, depth, isParentActive) {
+  try {
+    if (depth <= 0) {
+      // If depth reaches 0, return an empty array to stop recursion
+      return [];
+    }
+
+    const user = await User.findOne({ userId }).select('userId is_active').lean();
+
+    if (!user) {
+      return [];
+    }
+
+    const activeStatus = user.is_active ? 'active' : 'not active';
+    const teamStructure = {
+      level: 6 - depth, // The current level, from 1 to 5
+      userId: user.userId,
+      status: activeStatus,
+      activeUsersCount: activeStatus === 'active' ? 1 : 0,
+      downline: [],
+    };
+
+    const downlineUsers = await User.find({ sponsorId: userId }).lean();
+    const downlinePromises = downlineUsers.map((downlineUser) => getActiveUsersByLevel(downlineUser.userId, depth - 1, user.is_active)); // Pass the is_active from the parent
+    const downlineResults = await Promise.all(downlinePromises);
+
+    teamStructure.downline = downlineResults.filter((item) => item.length > 0); // Filter out empty results
+
+    // Count number of active users on this level
+    teamStructure.activeUsersCount += downlineResults.reduce((count, downline) => count + downline.reduce((c, user) => c + user.activeUsersCount, 0), 0);
+
+    // Assign the rank based on the number of active users at this level
+    teamStructure.rank = calculateRank(teamStructure.activeUsersCount, isParentActive);
+
+    return [teamStructure];
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    throw error;
+  }
+}
+
+// Function to calculate rank based on the number of active users and validate rank achievement
+function calculateRank(activeUsersCount, isParentActive) {
+  if (!isParentActive) {
+    return 'Inactive'; // If the parent is not active, set rank to 'Inactive' for this level
+  } else if (activeUsersCount > 2000) {
+    return 'Diamond Rank';
+  } else if (activeUsersCount > 1000) {
+    return 'Gold Rank';
+  } else if (activeUsersCount > 400) {
+    return 'Silver Rank';
+  } else if (activeUsersCount > 70) {
+    return 'Bronze Rank';
+  } else if (activeUsersCount > 14) {
+    return 'Starter Rank';
+  } else {
+    // If user has not achieved level 1 rank, set rank to 'No Rank'
+    return isParentActive ? 'No Rank' : 'Inactive';
+  }
+}
+
+// Function to filter and remove ranks if the user has not achieved a lower rank
+function filterAchievedRanks(teamStructureArray) {
+  let maxAchievedRank = 'Inactive';
+  return teamStructureArray.filter((teamStructure) => {
+    if (teamStructure.rank !== 'Inactive' && teamStructure.rank !== 'No Rank') {
+      if (teamStructure.rank === 'Starter Rank') {
+        maxAchievedRank = 'Starter Rank';
+        return true;
+      } else if (teamStructure.rank === 'Bronze Rank' && maxAchievedRank !== 'Starter Rank') {
+        maxAchievedRank = 'Bronze Rank';
+        return true;
+      } else if (teamStructure.rank === 'Silver Rank' && maxAchievedRank !== 'No Rank') {
+        maxAchievedRank = 'Silver Rank';
+        return true;
+      } else if (teamStructure.rank === 'Gold Rank' && maxAchievedRank !== 'No Rank') {
+        maxAchievedRank = 'Gold Rank';
+        return true;
+      } else if (teamStructure.rank === 'Diamond Rank' && maxAchievedRank !== 'No Rank') {
+        maxAchievedRank = 'Diamond Rank';
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  });
+}
+
+// new latest code that show the Rank End
+
+
 
 router.get("/profile", auth, async (req, res) => {
   try {

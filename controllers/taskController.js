@@ -51,7 +51,8 @@
 // taskController.js
 const Task = require('../models/newTask');
 const UserTask = require('../models/userTasks');
-// const mongoose = require('mongoose');
+const mongoose = require('mongoose');
+const { ObjectId } = mongoose.Types;
 const getAllTasks = async (req, res) => {
   try {
     const tasks = await Task.find();
@@ -233,6 +234,89 @@ const deleteAllTasks = async (req, res) => {
     res.status(500).json({ error: 'Failed to delete all tasks' });
   }
 };
+// const  taskStatus =( async (req, res) => {
+//   const userId = req.params.userId;
+
+//   try {
+//     const userTaskStatus = {};
+
+//     // Loop from level 0 to level 5
+//     for (let level = 0; level <= 5; level++) {
+//       // Check if there is a task entry for the given level and userId
+//       const taskEntry = await UserTask.findOne({
+//         userId: mongoose.Types.ObjectId(userId),
+//         taskId: mongoose.Types.ObjectId(level),
+//       });
+
+//       // Determine completion status for the level
+//       if (taskEntry) {
+//         userTaskStatus[`level${level}`] = 'complete';
+//       } else {
+//         userTaskStatus[`level${level}`] = 'not complete';
+//       }
+//     }
+
+//     res.json(userTaskStatus);
+//   } catch (error) {
+//     console.log(error)
+//     res.status(500).json({ error: 'Error fetching user task status' });
+//   }
+// });
+const taskStatus = async (userId, level) => {
+  if (level > 5) {
+    // Base case: reached the maximum level, return "completed" as default
+    return "completed";
+  }
+
+  try {
+    // Convert the level to ObjectId using the correct factory function from Mongoose
+    const levelObjectId = mongoose.Types.ObjectId(level.toString());
+
+    // Check if there is a task entry for the given level and userId
+    const taskEntry = await UserTask.findOne({
+      userId: mongoose.Types.ObjectId(userId),
+      taskId: levelObjectId,
+    });
+
+    // Determine completion status for the level
+    if (taskEntry) {
+      // If the user has completed the task for this level, move on to the next level
+      return taskStatus(userId, level + 1);
+    } else {
+      // If the user has not completed the task for this level, return "pending"
+      return "pending";
+    }
+  } catch (error) {
+    console.log(error);
+    throw new Error('Error fetching user task status');
+  }
+};
+
+// Usage example:
+const getUserTaskStatus = async (userId) => {
+  try {
+    // Start with level 0
+    const level = 0;
+    const status = await taskStatus(userId, level);
+    return { status };
+  } catch (error) {
+    console.log(error);
+    throw new Error('Error fetching user task status');
+  }
+};
+
+// API endpoint
+const taskCompletionStatus =( async (req, res) => {
+  const userId = req.params.userId;
+
+  try {
+    const userTaskStatus = await getUserTaskStatus(userId);
+    res.json(userTaskStatus);
+  } catch (error) {
+    res.status(500).json({ error: 'Error fetching user task status' });
+  }
+});
+
 
 module.exports = {
   getAllTasks,
@@ -240,5 +324,6 @@ module.exports = {
   createTask,
   markTaskCompleted,
   deleteTask,
-  deleteAllTasks
+  deleteAllTasks,
+  taskCompletionStatus
 };
