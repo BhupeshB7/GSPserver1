@@ -172,13 +172,76 @@ router.post("/userWalletUpdating/", async (req, res) => {
 // }
 // latest team structure code end 
 
-
+//old down line code  line no 176-237
 // Get user's team structure
+// router.get('/team/:userId', async (req, res) => {
+//   const { userId } = req.params;
+
+//   try {
+//     const teamStructure = await getUserTeam(userId);
+//     res.json(teamStructure);
+//   } catch (error) {
+//     console.error('Error fetching team structure:', error);
+//     res.status(500).json({ error: 'An error occurred while fetching the team structure.' });
+//   }
+// });
+
+// // Recursive function to fetch the user's team structure
+// async function getUserTeam(userId) {
+//   try {
+//     const user = await User.findOne({ userId }).select('userId name mobile is_active').lean();
+
+//     if (!user) {
+//       return null;
+//     }
+
+//     const activeStatus = user.is_active ? 'active' : 'not active';
+//     const teamStructure = {
+//       userId: user.userId,
+//       name: user.name,
+//       mobile: user.mobile,
+//       status: activeStatus,
+//       downlineCount: 0,
+//       activeDownlineCount: 0,
+//       allUsersCount:0,
+//       activeUsersCount :0,
+//       downline: [],
+//     };
+
+//     // const downlineUsers = await User.find({ sponsorId: userId }).lean();
+//     // const downlinePromises = downlineUsers.map((downlineUser) => getUserTeam(downlineUser.userId));
+//     // const downlineTeam = await Promise.all(downlinePromises);
+
+//     // teamStructure.downline = downlineTeam;
+//     // teamStructure.downlineCount = downlineTeam.length;
+//     // teamStructure.activeDownlineCount = downlineTeam.reduce((count, downline) => count + (downline.status === 'active' ? 1 : 0), 0);
+
+//     const downlineUsers = await User.find({ sponsorId: userId }).lean();
+//     const downlinePromises = downlineUsers.map((downlineUser) => getUserTeam(downlineUser.userId));
+//     const downlineTeam = await Promise.all(downlinePromises);
+
+//     teamStructure.downline = downlineTeam;
+//     teamStructure.downlineCount = downlineTeam.length;
+//     teamStructure.activeDownlineCount = downlineTeam.reduce((count, downline) => count + (downline.status === 'active' ? 1 : 0), 0);
+
+//     // Count number of all users and active users
+//     teamStructure.allUsersCount = downlineTeam.reduce((count, downline) => count + downline.allUsersCount + 1, 0);
+//     teamStructure.activeUsersCount = downlineTeam.reduce((count, downline) => count + downline.activeUsersCount + (downline.status === 'active' ? 1 : 0), 0);
+
+//     return teamStructure;
+//   } catch (error) {
+//     console.error('Error fetching user:', error);
+//     throw error;
+//   }
+// }
+//old downline code  line no 176 - 237
+//
+// new downline code 239-299
 router.get('/team/:userId', async (req, res) => {
   const { userId } = req.params;
 
   try {
-    const teamStructure = await getUserTeam(userId);
+    const teamStructure = await getUserTeam(userId, 5); // Set the depth to 5 levels
     res.json(teamStructure);
   } catch (error) {
     console.error('Error fetching team structure:', error);
@@ -186,9 +249,13 @@ router.get('/team/:userId', async (req, res) => {
   }
 });
 
-// Recursive function to fetch the user's team structure
-async function getUserTeam(userId) {
+async function getUserTeam(userId, depth) {
   try {
+    if (depth <= 0) {
+      // If depth reaches 0, return null to stop recursion
+      return null;
+    }
+
     const user = await User.findOne({ userId }).select('userId name mobile is_active').lean();
 
     if (!user) {
@@ -203,30 +270,25 @@ async function getUserTeam(userId) {
       status: activeStatus,
       downlineCount: 0,
       activeDownlineCount: 0,
-      allUsersCount:0,
-      activeUsersCount :0,
+      allUsersCount: 0,
+      activeUsersCount: 0,
       downline: [],
     };
 
-    // const downlineUsers = await User.find({ sponsorId: userId }).lean();
-    // const downlinePromises = downlineUsers.map((downlineUser) => getUserTeam(downlineUser.userId));
-    // const downlineTeam = await Promise.all(downlinePromises);
-
-    // teamStructure.downline = downlineTeam;
-    // teamStructure.downlineCount = downlineTeam.length;
-    // teamStructure.activeDownlineCount = downlineTeam.reduce((count, downline) => count + (downline.status === 'active' ? 1 : 0), 0);
-
     const downlineUsers = await User.find({ sponsorId: userId }).lean();
-    const downlinePromises = downlineUsers.map((downlineUser) => getUserTeam(downlineUser.userId));
+    const downlinePromises = downlineUsers.map((downlineUser) => getUserTeam(downlineUser.userId, depth - 1)); // Decrement depth in recursive call
     const downlineTeam = await Promise.all(downlinePromises);
 
-    teamStructure.downline = downlineTeam;
-    teamStructure.downlineCount = downlineTeam.length;
-    teamStructure.activeDownlineCount = downlineTeam.reduce((count, downline) => count + (downline.status === 'active' ? 1 : 0), 0);
+    // Remove null elements from downlineTeam array
+    const filteredDownlineTeam = downlineTeam.filter((item) => item !== null);
+
+    teamStructure.downline = filteredDownlineTeam;
+    teamStructure.downlineCount = filteredDownlineTeam.length;
+    teamStructure.activeDownlineCount = filteredDownlineTeam.reduce((count, downline) => count + (downline.status === 'active' ? 1 : 0), 0);
 
     // Count number of all users and active users
-    teamStructure.allUsersCount = downlineTeam.reduce((count, downline) => count + downline.allUsersCount + 1, 0);
-    teamStructure.activeUsersCount = downlineTeam.reduce((count, downline) => count + downline.activeUsersCount + (downline.status === 'active' ? 1 : 0), 0);
+    teamStructure.allUsersCount = filteredDownlineTeam.reduce((count, downline) => count + downline.allUsersCount + 1, 0);
+    teamStructure.activeUsersCount = filteredDownlineTeam.reduce((count, downline) => count + downline.activeUsersCount + (downline.status === 'active' ? 1 : 0), 0);
 
     return teamStructure;
   } catch (error) {
@@ -234,8 +296,7 @@ async function getUserTeam(userId) {
     throw error;
   }
 }
-
-
+// new down line code 239-299
 
 router.get("/profile", auth, async (req, res) => {
   try {
