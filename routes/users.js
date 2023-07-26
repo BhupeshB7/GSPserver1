@@ -452,8 +452,8 @@ function countUsersByLevel(teamStructure) {
     if (!node) return;
 
     const status = node.status === 'active' ? 'active' : 'inactive';
-    result[`level${node.level}`] = (result[`level${node.level}`] || { active: 0, inactive: 0 });
-    result[`level${node.level}`][status]++;
+    result[`${node.level}`] = (result[`${node.level}`] || { active: 0, inactive: 0 });
+    result[`${node.level}`][status]++;
 
     node.downline.forEach((child) => traverse(child));
   }
