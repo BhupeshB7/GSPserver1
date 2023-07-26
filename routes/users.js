@@ -312,6 +312,80 @@ async function getUserTeam(userId, depth) {
 //   }
 // });
 
+// const cache = new NodeCache({ stdTTL: 60 }); // Set cache TTL to 60 seconds (adjust as needed)
+
+// router.get('/teamStructure/:userId', async (req, res) => {
+//   const { userId } = req.params;
+//   const cachedData = cache.get(userId);
+
+//   if (cachedData) {
+//     console.log("Serving from cache");
+//     res.json(cachedData);
+//   } else {
+//     try {
+//       const teamStructure = await getUserTeamStructure(userId, 6);
+//       const activeUsersByLevel = countActiveUsersByLevel(teamStructure);
+//       cache.set(userId, activeUsersByLevel); // Cache the data
+//       res.json(activeUsersByLevel);
+//     } catch (error) {
+//       console.error('Error fetching team structure:', error);
+//       res.status(500).json({ error: 'An error occurred while fetching the team structure.' });
+//     }
+//   }
+// });
+// async function getUserTeamStructure(userId, depth) {
+//   try {
+//     if (depth <= 0) {
+//       // If depth reaches 0, return null to stop recursion
+//       return null;
+//     }
+
+//     const user = await User.findOne({ userId }).select('userId is_active').lean();
+
+//     if (!user) {
+//       return null;
+//     }
+
+//     const activeStatus = user.is_active ? 'active' : 'not active';
+//     const teamStructure = {
+//       level: 6 - depth,
+//       userId: user.userId,
+//       status: activeStatus,
+//       downline: [],
+//     };
+
+//     const downlineUsers = await User.find({ sponsorId: userId }).lean();
+//     const downlinePromises = downlineUsers.map((downlineUser) => getUserTeam(downlineUser.userId, depth - 1)); // Decrement depth in recursive call
+//     const downlineTeam = await Promise.all(downlinePromises);
+
+//     // Remove null elements from downlineTeam array
+//     const filteredDownlineTeam = downlineTeam.filter((item) => item !== null);
+
+//     teamStructure.downline = filteredDownlineTeam;
+
+//     return teamStructure;
+//   } catch (error) {
+//     console.error('Error fetching user:', error);
+//     throw error;
+//   }
+// }
+
+// function countActiveUsersByLevel(teamStructure) {
+//   const result = {};
+
+//   function traverse(node) {
+//     if (!node) return;
+
+//     if (node.status === 'active') {
+//       result[`level${node.level}`] = (result[`level${node.level}`] || 0) + 1;
+//     }
+
+//     node.downline.forEach((child) => traverse(child));
+//   }
+
+//   traverse(teamStructure);
+//   return result;
+// }
 const cache = new NodeCache({ stdTTL: 60 }); // Set cache TTL to 60 seconds (adjust as needed)
 
 router.get('/teamStructure/:userId', async (req, res) => {
@@ -324,15 +398,16 @@ router.get('/teamStructure/:userId', async (req, res) => {
   } else {
     try {
       const teamStructure = await getUserTeamStructure(userId, 6);
-      const activeUsersByLevel = countActiveUsersByLevel(teamStructure);
-      cache.set(userId, activeUsersByLevel); // Cache the data
-      res.json(activeUsersByLevel);
+      const usersByLevel = countUsersByLevel(teamStructure);
+      cache.set(userId, usersByLevel); // Cache the data
+      res.json(usersByLevel);
     } catch (error) {
       console.error('Error fetching team structure:', error);
       res.status(500).json({ error: 'An error occurred while fetching the team structure.' });
     }
   }
 });
+
 async function getUserTeamStructure(userId, depth) {
   try {
     if (depth <= 0) {
@@ -370,15 +445,15 @@ async function getUserTeamStructure(userId, depth) {
   }
 }
 
-function countActiveUsersByLevel(teamStructure) {
+function countUsersByLevel(teamStructure) {
   const result = {};
 
   function traverse(node) {
     if (!node) return;
 
-    if (node.status === 'active') {
-      result[`level${node.level}`] = (result[`level${node.level}`] || 0) + 1;
-    }
+    const status = node.status === 'active' ? 'active' : 'inactive';
+    result[`level${node.level}`] = (result[`level${node.level}`] || { active: 0, inactive: 0 });
+    result[`level${node.level}`][status]++;
 
     node.downline.forEach((child) => traverse(child));
   }
@@ -386,6 +461,10 @@ function countActiveUsersByLevel(teamStructure) {
   traverse(teamStructure);
   return result;
 }
+
+
+
+
 
 // Level Structure End
 // count the Rank of user 
