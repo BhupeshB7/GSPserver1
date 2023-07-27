@@ -21,9 +21,9 @@ router.post('/withdraw/:userId', async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
     // Check if the user is active
-  if (!user.is_active) {
-    return res.status(400).json({ error: 'User is not active and cannot make withdrawals' });
-  }
+  // if (!user.is_active) {
+  //   return res.status(400).json({ error: 'User is not active and cannot make withdrawals' });
+  // }
     //   // check if the withdrawal amount is greater than or equal to 500
       if (amount < 500) {
         return res.status(400).json({ error: 'Minimum withdrawal amount is 500 Rs' });
