@@ -9,7 +9,7 @@ const router = express.Router();
 router.post('/withdraw/:userId', async (req, res) => {
   const { userId} = req.params;
   const { amount, GPay, ifscCode, accountNo, accountHolderName } = req.body;
-  const user = await User.findOne({ userId: userId });
+  const user = await User.findOne({ userId: userId, is_active:true });
 
   // Check if the withdrawal amount is greater than 0
   if (amount <= 0) {
