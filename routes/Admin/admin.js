@@ -8,29 +8,84 @@ const router = express.Router();
 // const adminAuth = require('../../controllers/Admin/adminAuth')
 const JWT_SECRET = process.env.JWT_SECRET;
 //For Admin login...
-router.post('/login', async (req, res) => {
+// router.post('/login', async (req, res) => {
+//   const { email, password } = req.body;
+
+//   const user = await User.findOne({ email });
+
+//   if (!user) {
+//     return res.status(400).json({ message: 'Invalid email or password' });
+//   }
+
+//   const isMatch = await bcrypt.compare(password, user.password);
+
+//   if (!isMatch) {
+//     return res.status(400).json({ message: 'Invalid email or password' });
+//   }
+
+//   if (user.role !== 'admin') {
+//     return res.status(403).json({ message: 'You are not authorized to access this resource' });
+//   }
+
+//   const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, { expiresIn: '1d' });
+
+//   res.json({ token });
+// });
+const isAdminOrAuthenticatedMiddleware = async (req, res, next) => {
+  const { email } = req.body;
+
+  try {
+    // Check if the request contains a valid user token
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
+      const token = req.headers.authorization.split(' ')[1];
+      const decodedToken = jwt.verify(token, JWT_SECRET);
+
+      // If the token is valid and the user is already authenticated, proceed with the login
+      if (decodedToken) {
+        return next();
+      }
+    }
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(400).json({ message: 'Invalid email or password' });
+    }
+
+    if (user.role !== 'admin') {
+      return res.status(403).json({ message: 'You are not authorized to access this resource' });
+    }
+
+    // If the user is an admin, store the user object in the request for further use
+    req.adminUser = user;
+    next();
+  } catch (error) {
+    console.error('Error while checking admin status:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+// For Admin login
+router.post('/login', isAdminOrAuthenticatedMiddleware, async (req, res) => {
   const { email, password } = req.body;
+  const user = req.adminUser;
 
-  const user = await User.findOne({ email });
+  try {
+    const isMatch = await bcrypt.compare(password, user.password);
 
-  if (!user) {
-    return res.status(400).json({ message: 'Invalid email or password' });
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Invalid email or password' });
+    }
+
+    const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, { expiresIn: '1d' });
+
+    res.json({ token });
+  } catch (error) {
+    console.error('Error while logging in:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
-
-  const isMatch = await bcrypt.compare(password, user.password);
-
-  if (!isMatch) {
-    return res.status(400).json({ message: 'Invalid email or password' });
-  }
-
-  if (user.role !== 'admin') {
-    return res.status(403).json({ message: 'You are not authorized to access this resource' });
-  }
-
-  const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, { expiresIn: '1d' });
-
-  res.json({ token });
 });
+
 
 // router.get('/api/users', async (req, res) => {
 //   const users = await User.find();
