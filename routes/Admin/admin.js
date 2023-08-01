@@ -32,6 +32,7 @@ const JWT_SECRET = process.env.JWT_SECRET;
 //   res.json({ token });
 // });
 // Middleware to check if the user is an admin or already authenticated
+// Middleware to check if the user is an admin or already authenticated
 const isAdminOrAuthenticatedMiddleware = async (req, res, next) => {
   const { email } = req.body;
 
