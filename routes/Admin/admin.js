@@ -80,7 +80,7 @@ router.post('/login', isAdminOrAuthenticatedMiddleware, async (req, res) => {
 
       // If the token is valid and the user is already authenticated, use it for authentication
       if (decodedToken) {
-        const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, { expiresIn: '1d' });
+        const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, { expiresIn: '6h' });
         return res.json({ token });
       }
     }
@@ -91,7 +91,7 @@ router.post('/login', isAdminOrAuthenticatedMiddleware, async (req, res) => {
       return res.status(400).json({ message: 'Invalid email or password' });
     }
 
-    const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, { expiresIn: '1d' });
+    const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, { expiresIn: '6h' });
 
     res.json({ token });
   } catch (error) {
