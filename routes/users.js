@@ -4,39 +4,6 @@ const User = require("../models/User");
 const NodeCache = require("node-cache");
 const router = express.Router();
 
-// router.post('/userWalletUpdate/:userId', auth, async (req, res) => {
-//   const userId = req.params;
-//   try {
-//     await User.findOne({userId}, { income: 146 });
-//     await User.findOne({userId}, { balance: 146 });
-//     await User.findOne({userId}, { selfIncome: 120 });
-//     await User.findOne({userId}, { teamIncome: 26 });
-//     res.sendStatus(200);
-//   } catch (error) {
-//     console.error('Failed to update user names', error);
-//     res.sendStatus(500);
-//   }
-// });
-
-// router.post("/userWalletUpdating/:userId", async (req, res) => {
-//   const { userId } = req.params;
-//   try{
-//     let user = await User.findOne({ userId : userId});
-//     if (!user) {
-//       // console.log(`User with ID ${userId} not found`);
-//       return res.status(404).send("User not found");
-//     }
-//     // console.log(`User found: ${JSON.stringify(user)}`);
-//     user.balance === 146;
-//     user.income === 146;
-//     user.selfIncome === 120;
-//     user.teamIncome === 26;
-//     await user.save();
-//   }catch(error){
-//     res.status(500).json({error:'Internal server error'})
-//   }
-
-// })
 // Manually update user wallet through API
 router.post("/userWalletUpdating/", async (req, res) => {
   const { userId } = req.body;
@@ -70,170 +37,6 @@ router.post("/userWalletUpdating/", async (req, res) => {
   }
 });
 
-
-
-// Example using Express.js
-// router.get('/team/:userId', async (req, res) => {
-//   const { userId } = req.params;
-// const teamUser = await User.findOne({userId:userId});
-// if(!teamUser){
-//   return res.status(400).json({error:'user not Found'});
-// }
-//   try {
-//     const teamStructure = await getUserTeam(userId);
-//     res.json(teamStructure);
-//   } catch (error) {
-//     console.error('Error fetching team structure:', error);
-//     res.status(500).json({ error: 'An error occurred while fetching the team structure.' });
-//   }
-// });
-
-// // Recursive function to fetch the user's team structure
-// async function getUserTeam(userId) {
-//   try {
-//     const user = await User.find({userId:userId}).select('userId name mobile').lean();
-//     // if (!user) {
-//     //   return null;
-//     // }
-//     // const teamStructure = {
-//     //   userId: userId,
-//     //   // name: name,
-//     //   mobile: mobile,
-//     //   downline: [],
-//     // };
-//     // const downlineUser = await User.find({ userId: userId }).select('mobile').lean();
-//     const teamStructure = {
-//       userId: userId,
-//       // name: name,
-//       // mobile: mobile,
-//       downline: [],
-//     };
-//     const downlineUsers = await User.find({ sponsorId: userId }).lean().limit(2);
-//     for (const downlineUser of downlineUsers) {
-//       const downlineTeam = await getUserTeam(downlineUser.userId);
-//       teamStructure.downline.push(downlineTeam);
-//     }
- 
-
-//     return teamStructure;
-//   } catch (error) {
-//     console.error('Error fetching user:', error);
-//     throw error;
-//   }
-// }
-
-  // Latest team strructure code 
-// router.get('/team/:userId', async (req, res) => {
-//   const { userId } = req.params;
-
-//   try {
-//     const teamStructure = await getUserTeam(userId);
-//     res.json(teamStructure);
-//   } catch (error) {
-//     console.error('Error fetching team structure:', error);
-//     res.status(500).json({ error: 'An error occurred while fetching the team structure.' });
-//   }
-// });
-
-// // Recursive function to fetch the user's team structure
-// async function getUserTeam(userId) {
-//   try {
-//     // const user = await User.findOne({ userId }).lean();
-//     const user = await User.findOne({ userId }).select('userId name mobile is_active').lean();
-
-//     if (!user) {
-//       return null;
-//     }
-// const activeStatus = user.is_active ? 'active':'not active'
-//     const teamStructure = {
-//       userId: user.userId,
-//       name: user.name,
-//       mobile: user.mobile,
-//       status: activeStatus,
-//       downline: [],
-//     };
-
-//     // const downlineUsers = await User.find({ sponsorId: userId }).lean();
-//     // for (const downlineUser of downlineUsers) {
-//     //   const downlineTeam = await getUserTeam(downlineUser.userId);
-//     //   teamStructure.downline.push(downlineTeam);
-//     // }
-//     const downlineUsers = await User.find({ sponsorId: userId }).lean();
-// const downlinePromises = downlineUsers.map((downlineUser) => getUserTeam(downlineUser.userId));
-// const downlineTeam = await Promise.all(downlinePromises);
-// teamStructure.downline = downlineTeam;
-
-
-//     return teamStructure;
-//   } catch (error) {
-//     console.error('Error fetching user:', error);
-//     throw error;
-//   }
-// }
-// latest team structure code end 
-
-//old down line code  line no 176-237
-// Get user's team structure
-// router.get('/team/:userId', async (req, res) => {
-//   const { userId } = req.params;
-
-//   try {
-//     const teamStructure = await getUserTeam(userId);
-//     res.json(teamStructure);
-//   } catch (error) {
-//     console.error('Error fetching team structure:', error);
-//     res.status(500).json({ error: 'An error occurred while fetching the team structure.' });
-//   }
-// });
-
-// // Recursive function to fetch the user's team structure
-// async function getUserTeam(userId) {
-//   try {
-//     const user = await User.findOne({ userId }).select('userId name mobile is_active').lean();
-
-//     if (!user) {
-//       return null;
-//     }
-
-//     const activeStatus = user.is_active ? 'active' : 'not active';
-//     const teamStructure = {
-//       userId: user.userId,
-//       name: user.name,
-//       mobile: user.mobile,
-//       status: activeStatus,
-//       downlineCount: 0,
-//       activeDownlineCount: 0,
-//       allUsersCount:0,
-//       activeUsersCount :0,
-//       downline: [],
-//     };
-
-//     // const downlineUsers = await User.find({ sponsorId: userId }).lean();
-//     // const downlinePromises = downlineUsers.map((downlineUser) => getUserTeam(downlineUser.userId));
-//     // const downlineTeam = await Promise.all(downlinePromises);
-
-//     // teamStructure.downline = downlineTeam;
-//     // teamStructure.downlineCount = downlineTeam.length;
-//     // teamStructure.activeDownlineCount = downlineTeam.reduce((count, downline) => count + (downline.status === 'active' ? 1 : 0), 0);
-
-//     const downlineUsers = await User.find({ sponsorId: userId }).lean();
-//     const downlinePromises = downlineUsers.map((downlineUser) => getUserTeam(downlineUser.userId));
-//     const downlineTeam = await Promise.all(downlinePromises);
-
-//     teamStructure.downline = downlineTeam;
-//     teamStructure.downlineCount = downlineTeam.length;
-//     teamStructure.activeDownlineCount = downlineTeam.reduce((count, downline) => count + (downline.status === 'active' ? 1 : 0), 0);
-
-//     // Count number of all users and active users
-//     teamStructure.allUsersCount = downlineTeam.reduce((count, downline) => count + downline.allUsersCount + 1, 0);
-//     teamStructure.activeUsersCount = downlineTeam.reduce((count, downline) => count + downline.activeUsersCount + (downline.status === 'active' ? 1 : 0), 0);
-
-//     return teamStructure;
-//   } catch (error) {
-//     console.error('Error fetching user:', error);
-//     throw error;
-//   }
-// }
 //old downline code  line no 176 - 237
 //
 // new downline code 239-299
@@ -298,94 +101,7 @@ async function getUserTeam(userId, depth) {
   }
 }
 // new down line code 239-299
-// Level Structure Start
-// router.get('/teamStructure/:userId', async (req, res) => {
-//   const { userId } = req.params;
 
-//   try {
-//     const teamStructure = await getUserTeamStructure(userId, 6); // Set the depth to 5 levels
-//     const activeUsersByLevel = countActiveUsersByLevel(teamStructure);
-//     res.json(activeUsersByLevel);
-//   } catch (error) {
-//     console.error('Error fetching team structure:', error);
-//     res.status(500).json({ error: 'An error occurred while fetching the team structure.' });
-//   }
-// });
-
-// const cache = new NodeCache({ stdTTL: 60 }); // Set cache TTL to 60 seconds (adjust as needed)
-
-// router.get('/teamStructure/:userId', async (req, res) => {
-//   const { userId } = req.params;
-//   const cachedData = cache.get(userId);
-
-//   if (cachedData) {
-//     console.log("Serving from cache");
-//     res.json(cachedData);
-//   } else {
-//     try {
-//       const teamStructure = await getUserTeamStructure(userId, 6);
-//       const activeUsersByLevel = countActiveUsersByLevel(teamStructure);
-//       cache.set(userId, activeUsersByLevel); // Cache the data
-//       res.json(activeUsersByLevel);
-//     } catch (error) {
-//       console.error('Error fetching team structure:', error);
-//       res.status(500).json({ error: 'An error occurred while fetching the team structure.' });
-//     }
-//   }
-// });
-// async function getUserTeamStructure(userId, depth) {
-//   try {
-//     if (depth <= 0) {
-//       // If depth reaches 0, return null to stop recursion
-//       return null;
-//     }
-
-//     const user = await User.findOne({ userId }).select('userId is_active').lean();
-
-//     if (!user) {
-//       return null;
-//     }
-
-//     const activeStatus = user.is_active ? 'active' : 'not active';
-//     const teamStructure = {
-//       level: 6 - depth,
-//       userId: user.userId,
-//       status: activeStatus,
-//       downline: [],
-//     };
-
-//     const downlineUsers = await User.find({ sponsorId: userId }).lean();
-//     const downlinePromises = downlineUsers.map((downlineUser) => getUserTeam(downlineUser.userId, depth - 1)); // Decrement depth in recursive call
-//     const downlineTeam = await Promise.all(downlinePromises);
-
-//     // Remove null elements from downlineTeam array
-//     const filteredDownlineTeam = downlineTeam.filter((item) => item !== null);
-
-//     teamStructure.downline = filteredDownlineTeam;
-
-//     return teamStructure;
-//   } catch (error) {
-//     console.error('Error fetching user:', error);
-//     throw error;
-//   }
-// }
-
-// function countActiveUsersByLevel(teamStructure) {
-//   const result = {};
-
-//   function traverse(node) {
-//     if (!node) return;
-
-//     if (node.status === 'active') {
-//       result[`level${node.level}`] = (result[`level${node.level}`] || 0) + 1;
-//     }
-
-//     node.downline.forEach((child) => traverse(child));
-//   }
-
-//   traverse(teamStructure);
-//   return result;
-// }
 const cache = new NodeCache({ stdTTL: 60 }); // Set cache TTL to 60 seconds (adjust as needed)
 
 router.get('/teamStructure/:userId', async (req, res) => {
@@ -537,6 +253,142 @@ function getHighestAchievedRank(activeUsersByLevel) {
   return { rank: highestAchievedRank };
 }
 
+router.post("/updateWalletss/:userId", async (req, res) => {
+  const { userId } = req.params;
+  let user = await User.findOne({ userId: userId });
+  if (!user) {
+    return res.status(404).send("User not found");
+  }
+
+  // Check if it's a new day and reset earnings if necessary
+  const currentDate = new Date();
+  const lastUpdatedDate = user.lastUpdated || currentDate;
+  if (!isSameDay(currentDate, lastUpdatedDate)) {
+    user.balance = 0;
+    user.income = 0;
+    user.selfIncome = 0;
+  }
+
+  const rankInfo = await getHighestAchievedRank(userId); // Get user's rank info
+  const rank = rankInfo.rank;
+
+  // Define the maximum earnings based on the user's rank
+  let maximumEarnings = 0;
+  switch (rank) {
+    case 'Fresher':
+      maximumEarnings = 500;
+      break;
+    case 'Starter':
+      maximumEarnings = 800;
+      break;
+    case 'Bronze':
+      maximumEarnings = 1500;
+      break;
+    case 'Silver':
+      maximumEarnings = 2000;
+      break;
+    case 'Gold':
+      maximumEarnings = 2500;
+      break;
+    case 'Diamond':
+      maximumEarnings = 3000;
+      break;
+    default:
+      maximumEarnings = 0; // You may want to handle other ranks accordingly
+      break;
+  }
+
+  // Calculate remaining earnings allowed for the day
+  const remainingBalance = maximumEarnings - user.balance;
+  const remainingIncome = maximumEarnings - user.income;
+  const remainingSelfIncome = maximumEarnings - user.selfIncome;
+
+  // Increment earnings within the remaining limits
+  user.balance += Math.min(30, remainingBalance);
+  user.income += Math.min(30, remainingIncome);
+  user.selfIncome += Math.min(30, remainingSelfIncome);
+
+  // Update the lastUpdated field to the current date
+  user.lastUpdated = currentDate;
+
+  await user.save();
+
+  if (user.is_active) {
+    let sponsor = await User.findOne({ userId: user.sponsorId });
+    let sponsorCount = await User.countDocuments({ userId: user.sponsorId, is_active: true });
+
+    if (sponsor && sponsorCount >= 1 && sponsor.is_active) {
+      sponsor.balance += 4;
+      sponsor.teamIncome += 4;
+      sponsor.income += 4;
+      await sponsor.save();
+
+      let sponsor2 = await User.findOne({ userId: sponsor.sponsorId });
+
+      if (sponsor2 && sponsor2.is_active) {
+        let sponsor2CountUser = await User.countDocuments({ sponsorId: sponsor2.userId, is_active: true });
+
+        if (sponsor2CountUser >= 2) {
+          sponsor2.teamIncome += 3;
+          sponsor2.balance += 3;
+          sponsor2.income += 3;
+          await sponsor2.save();
+
+          let sponsor3 = await User.findOne({ userId: sponsor2.sponsorId });
+
+          if (sponsor3 && sponsor3.is_active) {
+            let sponsor3CountUser = await User.countDocuments({ sponsorId: sponsor2.userId, is_active: true });
+
+            if (sponsor3CountUser >= 3) {
+              sponsor3.balance += 2;
+              sponsor3.teamIncome += 2;
+              sponsor3.income += 2;
+              await sponsor3.save();
+
+              let sponsor4 = await User.findOne({ userId: sponsor3.sponsorId });
+
+              if (sponsor4 && sponsor4.is_active) {
+                let sponsor4CountUser = await User.countDocuments({ sponsorId: sponsor3.userId, is_active: true });
+
+                if (sponsor4CountUser >= 4) {
+                  sponsor4.balance += 1;
+                  sponsor4.teamIncome += 1;
+                  sponsor4.income += 1;
+                  await sponsor4.save();
+
+                  let sponsor5 = await User.findOne({ userId: sponsor4.sponsorId });
+
+                  if (sponsor5 && sponsor5.is_active) {
+                    let sponsor5CountUser = await User.countDocuments({ sponsorId: sponsor4.userId, is_active: true });
+
+                    if (sponsor5CountUser >= 5) {
+                      sponsor5.balance += 1;
+                      sponsor5.teamIncome += 1;
+                      sponsor5.income += 1;
+                      await sponsor5.save();
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  res.send("Account increased successfully");
+});
+
+// Helper function to check if two dates are the same day
+function isSameDay(date1, date2) {
+  return (
+    date1.getFullYear() === date2.getFullYear() &&
+    date1.getMonth() === date2.getMonth() &&
+    date1.getDate() === date2.getDate()
+  );
+}
+
 
 
 router.get("/profile", auth, async (req, res) => {
@@ -549,79 +401,6 @@ router.get("/profile", auth, async (req, res) => {
   }
 });
 
-
-// router.post('/profileUpdate',auth, async (req, res) => {
-//   // const {id}= req.params;
-
-//   try {
-    // const user = await User.findById(req.user.id);
-    // const user = await User.findById({_id : id});
-
-//     if (!user) {
-//       return res.status(404).json({ error: 'User not found' });
-//     }
-
-//     if (req.body.name) {
-//       user.name = req.body.name.trim();
-//     }
-//     if (req.body.accountHolderName) {
-//       user.accountHolderName = req.body.accountHolderName.trim();
-//     }
-
-//     if (req.body.bio) {
-//       user.bio = req.body.bio.trim();
-//     }
-//     if (req.body.address) {
-//       user.address = req.body.address.trim();
-//     }
-//     if (req.body.accountNo) {
-//       user.accountNo = req.body.accountNo.trim();
-//     }
-//     if (req.body.ifscCode) {
-//       user.ifscCode = req.body.ifscCode.trim();
-//     }
-//      //For google Pay
-//      if (req.body.GPay) {
-//       const GPay = req.body.GPay.trim();
-//       const GPayExists = await User.findOne({ GPay });
-//       if (GPayExists && GPayExists._id.toString() !== user._id.toString()) {
-//         return res.status(400).json({ error: 'Gpay number already exists' });
-//       }
-//       user.GPay = GPay;
-//     }
-//     if (req.body.mobile) {
-//       const mobile = req.body.mobile.trim();
-//       const mobileExists = await User.findOne({ mobile });
-//       if (mobileExists && mobileExists._id.toString() !== user._id.toString()) {
-//         return res.status(400).json({ error: 'Mobile number already exists' });
-//       }
-//       user.mobile = mobile;
-//     }
-// if (req.body.aadhar) {
-//       const aadhar = req.body.aadhar.trim();
-//       const aadharExists = await User.findOne({ aadhar });
-//       if (aadharExists && aadharExists._id.toString() !== user._id.toString()) {
-//         return res.status(400).json({ error: 'Aadhar number already exists' });
-//       }
-//       user.aadhar = aadhar;
-//     }
-//     if (req.body.email) {
-//       const email = req.body.email.trim().toLowerCase();
-//       const emailExists = await User.findOne({ email });
-//       if (emailExists && emailExists._id.toString() !== user._id.toString()) {
-//         return res.status(400).json({ error: 'Email already exists' });
-//       }
-//       user.email = email;
-//     }
-
-//     await user.save();
-
-//     res.json({ message: 'Profile updated successfully' });
-//   } catch (error) {
-//     console.error(error.message);
-//     res.status(500).send('Server Error for updation');
-//   }
-// });
 
 
 router.post('/profileUpdate',auth, async (req, res) => {
@@ -765,70 +544,5 @@ router.get('/sponsors', async (req, res) => {
   }
 });
 
-
-// Route to handle the request
-// router.get('/find-matching-sponsors/:userId', async (req, res) => {
-//   const { userId } = req.params;
-
-//   try {
-//       // Find all users whose sponsorId matches the given userId
-//       const matchedUsers = await User.find({ sponsorId: userId });
-
-//       // Extract the sponsorIds from the matched users
-//       const sponsorIds = matchedUsers.map(user => user.sponsorId);
-  
-//       // Find all users whose sponsorId is in the sponsorIds array
-//       const matchedUsers2 = await User.find({ sponsorId: { $in: sponsorIds } });
-  
-//       // Extract the sponsorIds from the second set of matched users
-//       const sponsorIds2 = matchedUsers2.map(user => user.sponsorId);
-
-//       // Find all users whose sponsorId is in the sponsorIds2 array
-//       const matchedUsers3 = await User.find({ sponsorId: { $in: sponsorIds2 } });
-  
-//       // Extract the sponsorIds from the third set of matched users
-//       const sponsorIds3 = matchedUsers3.map(user => user.sponsorId);
-  
-//       res.json({ sponsorIds: sponsorIds3 });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ error: 'Server error' });
-//   }
-// });
-
-
-
-
-
-// API route to get different sponsors based on all sponsors
-// router.get('/api/users/different-sponsors/:userId', async (req, res) => {
-//   try {
-//     const { userId } = req.params;
-
-   
-//     // Find the user's sponsor
-//     const user = await User.findOne({ userId });
-
-//     if (!user) {
-//       return res.status(404).json({ error: 'User not found' });
-//     }
-
-//     // Find all sponsors
-//     const sponsors = await User.find({ sponsorId: user.userId });
-
-//     if (sponsors.length === 0) {
-//       return res.json([]);
-//     }
-
-//     // Find different sponsors based on all sponsors
-//     const differentSponsors = await User.find({
-//       sponsorId: { $nin: sponsors.map((sponsor) => sponsor.userId) },
-//     });
-
-//     res.json(differentSponsors);
-//   } catch (error) {
-//     res.status(500).json({ error: 'Internal server error' });
-//   }
-// });
 
 module.exports = router;

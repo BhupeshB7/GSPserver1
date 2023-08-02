@@ -25,15 +25,6 @@ mongoose.connect(process.env.MONGO_URL, {
   }));
   app.use(express.json());
   app.use(fileUpload())
-  // app.use(express.urlencoded({ extended: true }));
-  // app.use('/uploads',express.static('./uploads'))
-  
-// Use the uploadRoutes middleware
-// app.use('/upload', require('./routes/depositUser'));
-
-// Serve uploaded images
-// app.use('/uploads', express.static(path.join(__dirname, 'client', 'uploads'))); // Serve the uploads directory within the client folder
-
 // error handler middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
@@ -68,6 +59,8 @@ app.use('/api', require('./routes/level'));
 //level
 // app.use('/api', require('./routes/userLevel'));
 app.use('/api', require('./routes/DailyLevelincome'))
+// for fund Transfer
+app.use('/api', require('./routes/fundMove'))
 //contact
 app.use('/api', require('./routes/contact'));
 app.use('/api', taskRoutes);

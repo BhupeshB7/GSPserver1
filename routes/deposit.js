@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Deposit = require('../models/Deposit');
 const imageValidate = require('../utils/imageValidate');
-const User = require('../models/User');
+// const User = require('../models/User');
 const Topup = require('../models/Topup');
 
 router.post('/user',  async (req, res) => {

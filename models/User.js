@@ -84,11 +84,16 @@ withdrawal:{type:Number, default:0},
 selfIncome:{type:Number, default:0},
 teamIncome:{type:Number, default:0},
 rewards:{type:Number, default:0},
+topupWallet: { type: Number, default: 0 },
+pendingTransfer: { type: mongoose.Schema.Types.ObjectId, ref: 'PendingTransfer' },
 activationTime: {
   type: Date,
   default: null
 },
-
+  // Add the new field for tracking lastUpdated date
+  lastUpdated: {
+    type: Date,
+  },
 date: {Date},
  }, {timestamps: true},
 );
