@@ -23,5 +23,19 @@ router.get('/reTopup', async (req, res) => {
       res.status(500).json({ message: 'Server error' });
     }
   });
+  router.get('/reTopup/:userId', async (req, res) => {
+    try {
+      const userId = req.params.userId;
+      const user = await reTopup.findOne({ userId });
   
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+  
+      res.status(200).json(user);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
   module.exports = router;
