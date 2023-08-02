@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const reTopup = require('../models/ReTopupUser')
 // API Endpoint to insert data into the database
-router.post('/reTopup', async (req, res) => {
+router.post('/reTopup', async (req, res) => { 
     try {
       const userData = req.body;
       const newUser = new reTopup(userData);
