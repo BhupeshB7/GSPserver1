@@ -25,8 +25,8 @@ router.get('/reTopup', async (req, res) => {
   });
   router.get('/reTopup/:userId', async (req, res) => {
     try {
-      const userId = req.params.userId;
-      const user = await reTopup.findOne({ userId });
+      const userID = req.params.userId;
+      const user = await reTopup.findOne({ userID:userID });
   
       if (!user) {
         return res.status(404).json({ message: 'User not found' });
