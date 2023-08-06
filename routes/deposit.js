@@ -178,13 +178,13 @@ const activateUser = async (userId) => {
 router.post("/topUpUserID/:userID", async (req, res) => {
   try {
     const { userID } = req.params;
-    const deposit = await Deposit.findOne({ userID }).select("isApproved depositAmount").lean().exec();
+    const deposit = await User.findOne({ userId:userID }).select("userId topupWallet balance is_active ").lean().exec();
 
     if (!deposit) {
       return res.status(401).send("User not found!");
     }
 
-    if (deposit.isApproved) {
+    if (deposit.is_active) {
       const { userId } = req.body;
       const activeUser = await User.findOne({ userId }).select("userId is_active topupWallet").lean().exec();
 
@@ -192,18 +192,18 @@ router.post("/topUpUserID/:userID", async (req, res) => {
         return res.status(201).send("User already activated!");
       }
 
-      const depositUser = await Deposit.findOne({ userID });
+      // const depositUser = await Deposit.findOne({ userID });
 
-      if (depositUser.depositAmount < 800) {
-        return res.status(400).json({ error: "Low Balance" });
-      }
+      // if (depositUser.depositAmount < 800) {
+      //   return res.status(400).json({ error: "Low Balance" });
+      // }
 
       const activationStatus = await activateUser(userId);
 
       if (activationStatus) {
         const topUpAmount = 800;
-        depositUser.depositAmount -= topUpAmount;
-        await depositUser.save();
+        // depositUser.depositAmount -= topUpAmount;
+        // await depositUser.save();
 
         const activeDeposit = await User.findOne({userId:userID})
         if (activeDeposit.topupWallet < 800) {
