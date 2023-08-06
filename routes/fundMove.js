@@ -34,8 +34,11 @@ router.post("/transfer/:userId", async (req, res) => {
     // console.log("User Income Balance before transfer:", user.balance);
     // console.log("Transfer Amount:", transferAmount);
     // console.log("*===============*");
+    if(transferAmount <= 850 ){
+      res.json({error:'Minimum/Low  Balance'})
+    }
     if (transferAmount <= user.balance) {
-      const deduction = transferAmount * 0.1; // 10% deduction
+      const deduction = transferAmount * 0.05; // 10% deduction
       const transferAfterDeduction = transferAmount - deduction;
 
       user.balance -= transferAmount;
