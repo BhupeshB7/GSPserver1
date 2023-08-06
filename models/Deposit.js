@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const imageSchema = mongoose.Schema({
-  path: {type: String, required: true}
+  path: {type: String}
 })
 const userSchema = new Schema({
   name: {
@@ -13,8 +13,7 @@ const userSchema = new Schema({
     required: true
   },
   userID: {
-    type: String,
-    required: true
+    type: String
   },
   depositAmount:{
     type:Number,

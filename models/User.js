@@ -1,6 +1,12 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 // const bcrypt = require('bcrypt');
+const pendingTransferSchema = new mongoose.Schema({
+  amount: { type: Number, default: 0 },
+  deduction: { type: Number, default: 0 },
+  status: { type: String, default: 'Pending' },
+});
+
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -85,7 +91,7 @@ selfIncome:{type:Number, default:0},
 teamIncome:{type:Number, default:0},
 rewards:{type:Number, default:0},
 topupWallet: { type: Number, default: 0 },
-pendingTransfer: { type: mongoose.Schema.Types.ObjectId, ref: 'PendingTransfer' },
+pendingTransfer: [pendingTransferSchema],
 activationTime: {
   type: Date,
   default: null
