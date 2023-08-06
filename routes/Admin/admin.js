@@ -39,8 +39,8 @@ const isAdminOrAuthenticatedMiddleware = async (req, res, next) => {
   try {
     // Check if the request contains a valid admin token
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
-      const adminToken = req.headers.authorization.split(' ')[1];
-      const decodedToken = jwt.verify(adminToken, JWT_SECRET);
+      const aToken = req.headers.authorization.split(' ')[1];
+      const decodedToken = jwt.verify(aToken, JWT_SECRET);
 
       // If the token is valid and the user is already authenticated, proceed with the login
       if (decodedToken) {
@@ -75,13 +75,13 @@ router.post('/login', isAdminOrAuthenticatedMiddleware, async (req, res) => {
   try {
     // Check if the request contains a valid admin token
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
-      const adminToken = req.headers.authorization.split(' ')[1];
-      const decodedToken = jwt.verify(adminToken, JWT_SECRET);
+      const aToken = req.headers.authorization.split(' ')[1];
+      const decodedToken = jwt.verify(aToken, JWT_SECRET);
 
       // If the token is valid and the user is already authenticated, use it for authentication
       if (decodedToken) {
-        const adminToken = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, { expiresIn: '6h' });
-        return res.json({ adminToken });
+        const aToken = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, { expiresIn: '6h' });
+        return res.json({ aToken });
       }
     }
 
