@@ -96,6 +96,60 @@ router.post("/transfer/:userId", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+// Get all pending transfers for a specific user
+router.get("/pendingTransfers/:userId", async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const allTransfers = user.pendingTransfer;
+
+    res.json({ allTransfers });
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// Assuming you have already imported the necessary dependencies and set up your Express router and User model.
+
+router.get("/allTransfers", async (req, res) => {
+  try {
+    // Fetch all users from the database and populate their pending transfers
+    const allUsers = await User.find().populate("pendingTransfer");
+
+    // Create an array to store all users' pending transfers with their details
+    const allTransfersWithDetails = [];
+
+    // Loop through each user to extract their pending transfers and details
+    allUsers.forEach((user) => {
+      // Extract the necessary user details
+      const userDetails = {
+        userId: user.userId,
+        userName: user.name,
+        // Add other user details you want to include
+      };
+
+      // Combine the user details with their pending transfers and add to the array
+      user.pendingTransfer.forEach((transfer) => {
+        allTransfersWithDetails.push({
+          ...userDetails,
+          transferDetails: transfer,
+        });
+      });
+    });
+
+    // Return the array of all users' pending transfers with details
+    res.json({ allTransfers: allTransfersWithDetails });
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+
 
 
 
