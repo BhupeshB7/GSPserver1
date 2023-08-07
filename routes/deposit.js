@@ -240,10 +240,16 @@ router.patch("/activate/:id", async (req, res) => {
     user.isApproved = true;
     // user.activationTime = new Date();
     await user.save();
-
-    res.json(user);
+    const userD = user.userID;
+   const userAccount =  await User.findOne({userId:userD}).select('_id topupWallet');
+   if (!userAccount) {
+    return res.status(401).json({ error: "User account not found" });
+  }
+     userAccount.topupWallet += user.depositAmount;
+     await userAccount.save();
+    res.json({message:'Approved', user});
   } catch (error) {
-    // console.log(error);
+    console.log(error);
     res.status(500).json({ error: "Server error" });
   }
 });
