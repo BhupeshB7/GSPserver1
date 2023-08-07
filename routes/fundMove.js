@@ -34,29 +34,57 @@ router.post("/transfer/:userId", async (req, res) => {
     // console.log("User Income Balance before transfer:", user.balance);
     // console.log("Transfer Amount:", transferAmount);
     // console.log("*===============*");
+    if (!user.is_active) {
+      return res.status(403).json({ error: "User is not active" });
+    }
+    // Check if there is a user with the same SponsorId and is_active
+    const sponsorIdMatches = await User.countDocuments({ sponsorId: user.userId, is_active: true });
+    if (sponsorIdMatches < 1) {
+      return res.status(400).json({ error: "Minimum One active users  required for fund transfer" });
+    }
+
     if(transferAmount <= 850 ){
       res.json({error:'Minimum/Low  Balance'})
     }
+    // if (transferAmount <= user.balance) {
+    //   const deduction = transferAmount * 0.05; // 10% deduction
+    //   const transferAfterDeduction = transferAmount - deduction;
+
+    //   user.balance -= transferAmount;
+    //   user.pendingTransfer = {
+    //     amount: transferAfterDeduction,
+    //     deduction: deduction,
+    //     status: "Pending",
+    //   };
+
+    //   await user.save();
+
+    //   // console.log("User Income Balance after transfer:", user.balance);
+
+    //   res.json({
+    //     message: "Transfer requested and pending approval.",
+    //     balance: user.balance,
+    //   });
+    // }
     if (transferAmount <= user.balance) {
-      const deduction = transferAmount * 0.05; // 10% deduction
+      const deduction = transferAmount * 0.05; // 5% deduction
       const transferAfterDeduction = transferAmount - deduction;
 
       user.balance -= transferAmount;
-      user.pendingTransfer = {
+      user.pendingTransfer.push({
         amount: transferAfterDeduction,
         deduction: deduction,
         status: "Pending",
-      };
+      });
 
       await user.save();
-
-      // console.log("User Income Balance after transfer:", user.balance);
 
       res.json({
         message: "Transfer requested and pending approval.",
         balance: user.balance,
       });
-    } else {
+    } 
+     else {
       console.log("Insufficient funds in the income wallet.");
       res.status(400).json({
         error: "Insufficient funds in the income wallet.",
@@ -89,7 +117,7 @@ router.post("/transfer/approve/:userId", async (req, res) => {
     pendingTransfer.status = "Approved"; // Update the status of the pendingTransfer
 
     await user.save();
-    res.json({ message: "Transfer approved and funds moved to TOPUP wallet." });
+    res.json({ message: "Transfer approved and funds moved to TOPUP wallet.", user });
   } catch (error) {
     res.status(500).json({ error: "Internal server error" });
   }
@@ -114,7 +142,7 @@ router.post("/transfer/reject/:userId", async (req, res) => {
 
     await user.save();
     res.json({
-      message: "Transfer rejected and funds returned to the income wallet.",
+      message: "Transfer rejected and funds returned to the income wallet.",user
     });
   } catch (error) {
     res.status(500).json({ error: "Internal server error" });
