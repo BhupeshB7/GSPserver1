@@ -5,7 +5,7 @@ const pendingTransferSchema = new mongoose.Schema({
   amount: { type: Number, default: 0 },
   deduction: { type: Number, default: 0 },
   status: { type: String, default: 'Pending' },
-});
+}, {timestamps: true},);
 
 const userSchema = new mongoose.Schema({
   name: {
