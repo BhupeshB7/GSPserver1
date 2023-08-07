@@ -174,7 +174,13 @@ const activateUser = async (userId) => {
     return null;
   }
 };
-
+// Helper function to check if 45 days have passed since activation
+const isAutoDeactivateTime = (activationTime) => {
+  const currentTime = new Date();
+  const timeDifference = currentTime.getTime() - activationTime.getTime();
+  const daysDifference = timeDifference / (1000 * 60 * 60 * 24);
+  return daysDifference >= 60;
+};
 router.post("/topUpUserID/:userID", async (req, res) => {
   try {
     const { userID } = req.params;
@@ -189,6 +195,11 @@ router.post("/topUpUserID/:userID", async (req, res) => {
       const activeUser = await User.findOne({ userId }).select("userId is_active topupWallet").lean().exec();
 
       if (activeUser.is_active) {
+        if (isAutoDeactivateTime(activeUser.activationTime)) {
+          activeUser.is_active = false;
+          await User.findOneAndUpdate({ userId }, { is_active: false });
+          return res.status(201).send("User auto-deactivated after 45 days of activation.");
+        }
         return res.status(201).send("User already activated!");
       }
 
@@ -211,7 +222,7 @@ router.post("/topUpUserID/:userID", async (req, res) => {
         }
         activeDeposit.topupWallet -= topUpAmount;
         await activeDeposit.save();
-
+        
         return res.status(201).json({ success: "User Activated", user: activationStatus });
       } else {
         return res.json({ error: "Failed to activate user." });
