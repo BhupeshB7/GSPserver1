@@ -188,8 +188,8 @@ router.get("/allTransfers", async (req, res) => {
     allUsers.forEach((user) => {
       // Extract the necessary user details
       const userDetails = {
-        _id : user._id,
-        userId: user.userId,
+        usersId : user.userId,
+        userId: user._id,
         userName: user.name,
         // Add other user details you want to include
       };
