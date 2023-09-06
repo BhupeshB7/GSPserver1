@@ -3,11 +3,8 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
 const app = express();
-const profileRoutes = require('./routes/profile');
 const passwordRoute = require('./routes/passwordReset');
 const register = require('./routes/register');
-const taskRoutes = require('./routes/taskRoute')
-const userTaskRoute = require('./routes/userTaskRoute')
 const fileUpload = require("express-fileupload");
 // Connect to MongoDB database
 mongoose.connect(process.env.MONGO_URL, {
@@ -32,39 +29,16 @@ app.use((err, req, res, next) => {
 });
 // Routes
 app.use("/api/auth", require("./routes/auth"));
-//For Task
-app.use('/api/task', require('./routes/task'));
-//
-app.use("/api/users", require("./routes/users"));
+
 //for User Register
 app.use('/api/users', register);
-//for User ReTopup
-app.use('/api/users',require('./routes/ReTopupUser'));
 //for password Reset
 app.use('/api/auth', passwordRoute);
-//Activation Routes
-app.use('/api/active',require('./routes/UserAuthTask'));
-// profile Routes
-app.use('/api/users', profileRoutes);
+app.use('/api/users', require('./routes/users'));
 //Admin Routes
 app.use("/api/admin", require('./routes/Admin/admin'));
-  //Deposit Routes
-  app.use('/api/deposit', require('./routes/deposit'));
-//Withdraw request
-app.use('/api', require('./routes/withdraw'));
-//direct request
-app.use('/api', require('./routes/direct'));
-//Task Completion
-app.use('/api', require('./routes/level'));
-//level
-// app.use('/api', require('./routes/userLevel'));
-app.use('/api', require('./routes/DailyLevelincome'))
-// for fund Transfer
-app.use('/api', require('./routes/fundMove'))
 //contact
 app.use('/api', require('./routes/contact'));
-app.use('/api', taskRoutes);
-app.use('/userTasks', userTaskRoute);
    // Admin 
   app.use((err, req, res, next) => {
     console.error(err.stack);

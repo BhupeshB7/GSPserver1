@@ -4,9 +4,9 @@ const User = require("../models/User");
 
 const router = express.Router();
 
-router.get("/profile", auth, async (req, res) => {
+router.get("/profile",  async (req, res) => {
   try {
-    const user = await User.findById(req.user._id).select("-password");
+    const user = await User.findById(req._id).select("-password -sposnsorId");
     res.json(user);
   } catch (error) {
     console.log(error);

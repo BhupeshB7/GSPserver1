@@ -69,7 +69,7 @@ const isAdminOrAuthenticatedMiddleware = async (req, res, next) => {
 
 // For Admin login
 router.post('/login', isAdminOrAuthenticatedMiddleware, async (req, res) => {
-  const { email, password } = req.body;
+  const { password } = req.body;
   const user = req.adminUser;
 
   try {
@@ -126,17 +126,7 @@ router.get('/api/users', async (req, res) => {
   res.json(users);
 });
 // Update user
-router.put('/active/:id', async (req, res) => {
-  try {
-    const { is_active, activationTime } = req.body;
-    const user = await User.findByIdAndUpdate(req.params.id, { is_active, activationTime }, { new: true });
 
-    res.json(user);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: 'Server error' });
-  }
-});
 router.delete('/api/users/:id', async (req, res) => {
   const { id } = req.params;
 
@@ -173,30 +163,18 @@ const countActiveItems = async (items) => {
   return activeItems.length;
 };
 
-router.get("/count-active-items", async (req, res) => {
-  const items = await User.find();
-  const numberOfActiveUser = await countActiveItems(items);
-  res.json({ numberOfActiveUser });
-});
-const countInActiveItems = async (items) => {
-  const inActiveItems = await items.filter(item=> !item.isActive);
-  return inActiveItems.length;
-};
 
-router.get("/count-inactive-items", async (req, res) => {
-  const items = await User.find();
-  const numberOfInActiveUser = await countInActiveItems(items);
-  res.json({ numberOfInActiveUser });
-});
+
+
 
 // Get all users (admin only)
-// router.get('/users', adminAuth, async (req, res) => {
-//     try {
-//       const users = await User.find();
-//       res.send(users);
-//     } catch (error) {
-//       res.status(500).send({ error: 'Internal server error.' });
-//     }
-//   });
+router.get('/users', async (req, res) => {
+    try {
+      const users = await User.find();
+      res.send(users);
+    } catch (error) {
+      res.status(500).send({ error: 'Internal server error.' });
+    }
+  });
   
 module.exports = router;

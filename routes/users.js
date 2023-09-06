@@ -391,7 +391,7 @@ function isSameDay(date1, date2) {
 
 
 
-router.get("/profile", auth, async (req, res) => {
+router.get("/profile",auth,  async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select("-password");
     res.json(user);
